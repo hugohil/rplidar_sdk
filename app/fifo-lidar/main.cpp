@@ -183,10 +183,10 @@ int main(int argc, const char * argv[]) {
   drv->startScan(0,1);
   printf("starting scan...\n");
 
-  // fetech result and print it out...
+  // fetch result and print it out...
   while (1) {
     sl_lidar_response_measurement_node_hq_t nodes[8192];
-    size_t   count = _countof(nodes);
+    size_t count = _countof(nodes);
 
     op_result = drv->grabScanDataHq(nodes, count);
 
@@ -195,9 +195,9 @@ int main(int argc, const char * argv[]) {
       for (int pos = 0; pos < (int)count ; ++pos) {
         pipe << ((nodes[pos].flag & SL_LIDAR_RESP_HQ_FLAG_SYNCBIT) ? "S;" : "");
         pipe << (nodes[pos].angle_z_q14 * 90.f) / 16384.f << ";";
-        pipe << nodes[pos].dist_mm_q2/4.0f << ";";
-        pipe << (nodes[pos].quality >> SL_LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
-        pipe << ";" << std::endl;
+        pipe << nodes[pos].dist_mm_q2 / 4.0f << ";";
+        pipe << (nodes[pos].quality >> SL_LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT) << ";";
+        pipe << std::endl;
       }
     }
     if (ctrl_c_pressed) {
