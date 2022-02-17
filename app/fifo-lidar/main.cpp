@@ -205,6 +205,7 @@ int main(int argc, const char * argv[]) {
     delay(16);
   }
 
+  printf("\nbye.\n");
   drv->stop();
   delay(200);
   pipe.close();
