@@ -192,24 +192,23 @@ int main(int argc, const char * argv[]) {
 
     if (SL_IS_OK(op_result)) {
       drv->ascendScanData(nodes, count);
+      pipe << "S;";
       for (int pos = 0; pos < (int)count ; ++pos) {
-        pipe << ((nodes[pos].flag & SL_LIDAR_RESP_HQ_FLAG_SYNCBIT) ? "S;" : "");
-        pipe << (nodes[pos].angle_z_q14 * 90.f) / 16384.f << ";";
-        pipe << nodes[pos].dist_mm_q2 / 4.0f << ";";
-        pipe << (nodes[pos].quality >> SL_LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT) << ";";
-        pipe << std::endl;
+        pipe << std::to_string((nodes[pos].angle_z_q14 * 90.f) / 16384.f) << ";";
+        pipe << std::to_string(nodes[pos].dist_mm_q2 / 4.0f) << ";";
       }
+      pipe << "E;" << std::endl;
     }
     if (ctrl_c_pressed) {
       break;
     }
+    delay(16);
   }
 
   drv->stop();
   delay(200);
   pipe.close();
   drv->setMotorSpeed(0);
-
 
 on_finished:
   if(drv) {
