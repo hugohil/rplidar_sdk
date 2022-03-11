@@ -129,7 +129,7 @@ int main(int argc, const char * argv[]) {
   }
 
   std::ofstream pipe;
-  pipe.open(opt_pipename);
+  pipe.open(opt_pipename, std::ofstream::out | std::ofstream::trunc);
   printf("named pipe opened: %s\n", opt_pipename);
 
   // create the driver instance
@@ -198,6 +198,9 @@ int main(int argc, const char * argv[]) {
         pipe << std::to_string(nodes[pos].dist_mm_q2 / 4.0f) << ";";
       }
       pipe << "E;" << std::endl;
+    }
+    if (pipe.fail()) {
+      pipe.clear();
     }
     if (ctrl_c_pressed) {
       break;
