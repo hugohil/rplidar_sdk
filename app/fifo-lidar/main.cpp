@@ -205,7 +205,7 @@ int main(int argc, const char * argv[]) {
     if (ctrl_c_pressed) {
       break;
     }
-    delay(16);
+    usleep(16 * 1000);
   }
 
   printf("\nbye.\n");
