@@ -19,7 +19,7 @@
 #
 HOME_TREE := ../
 
-MAKE_TARGETS := simple_grabber ultra_simple custom_baudrate fifo-lidar
+MAKE_TARGETS := simple_grabber ultra_simple custom_baudrate print-lidar
 
 include $(HOME_TREE)/mak_def.inc
 

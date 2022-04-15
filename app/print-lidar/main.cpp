@@ -1,6 +1,6 @@
 /*
  *  SLAMTEC LIDAR
- *  Named Pipe (FIFO) Data Grabber Demo App
+ *  Data Printer Demo App
  *
  *  Copyright (c) 2009 - 2014 RoboPeak Team
  *  http://www.robopeak.com
@@ -58,9 +58,9 @@ void print_usage (int argc, const char * argv[]) {
   printf("Custom LIDAR data grabber for SLAMTEC LIDAR.\n"
     "Version: %s \n"
     "Usage:\n"
-    "%s --port <serial port> [baudrate] [pipename]\n"
-    "The baudrate is 115200 (for A2) or 256000 (for A3). Default is 115200.\n",
-    "The default pipe name is \"rplidar\".\n"
+    "%s --port <serial port> [baudrate] # to print\n"
+    "%s --port <serial port> [baudrate] | ./other-app # to use datas somewhere else\n"
+    "The baudrate is 115200 (for A2) or 256000 (for A3). Default is 115200.\n"
     "SL_LIDAR_SDK_VERSION", argv[0], argv[0]);
 }
 
@@ -94,13 +94,12 @@ void ctrlc (int) {
 int main(int argc, const char * argv[]) {
   const char * opt1 = NULL;
   const char * opt_port = NULL;
-  const char * opt_pipename = NULL;
   sl_u32 opt_baudrate = 0;
   sl_result op_result;
 
   IChannel* _channel;
 
-  printf("Named pipes (FIFO) LIDAR data grabber for SLAMTEC LIDAR.\n"
+  printf("LIDAR data printer for SLAMTEC LIDAR.\n"
     "Version: %s\n", "SL_LIDAR_SDK_VERSION");
 
   if (argc > 1) {
@@ -122,15 +121,10 @@ int main(int argc, const char * argv[]) {
   if (strcmp(opt1, "--port") == 0) {
     opt_port = (argc > 2) ? argv[2] : default_port;
     opt_baudrate = (argc > 3) ? strtoul(argv[3], NULL, 10) : baudrateArray[0];
-    opt_pipename = (argc > 4) ? argv[4] : "rplidar";
   } else {
     print_usage(argc, argv);
     return -1;
   }
-
-  std::ofstream pipe;
-  pipe.open(opt_pipename, std::ofstream::out | std::ofstream::trunc);
-  printf("named pipe opened: %s\n", opt_pipename);
 
   // create the driver instance
 	ILidarDriver * drv = *createLidarDriver();
@@ -192,15 +186,12 @@ int main(int argc, const char * argv[]) {
 
     if (SL_IS_OK(op_result)) {
       drv->ascendScanData(nodes, count);
-      pipe << "S;";
+      std::cout << "S;";
       for (int pos = 0; pos < (int)count ; ++pos) {
-        pipe << std::to_string((nodes[pos].angle_z_q14 * 90.f) / 16384.f) << ";";
-        pipe << std::to_string(nodes[pos].dist_mm_q2 / 4.0f) << ";";
+        std::cout << std::to_string((nodes[pos].angle_z_q14 * 90.f) / 16384.f) << ";";
+        std::cout << std::to_string(nodes[pos].dist_mm_q2 / 4.0f) << ";";
       }
-      pipe << "E;" << std::endl;
-    }
-    if (pipe.fail()) {
-      pipe.clear();
+      std::cout << "E;" << std::endl;
     }
     if (ctrl_c_pressed) {
       break;
@@ -211,7 +202,6 @@ int main(int argc, const char * argv[]) {
   printf("\nbye.\n");
   drv->stop();
   delay(200);
-  pipe.close();
   drv->setMotorSpeed(0);
 
 on_finished:
