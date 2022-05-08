@@ -172,6 +172,11 @@ int main(int argc, const char * argv[]) {
   }
 
   signal(SIGINT, ctrlc);
+  signal(SIGPIPE, ctrlc);
+  signal(SIGKILL, ctrlc);
+  signal(SIGHUP, ctrlc);
+  signal(SIGTERM, ctrlc);
+  signal(SIGSTOP, ctrlc);
 
   drv->setMotorSpeed();
   drv->startScan(0,1);
